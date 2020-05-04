@@ -17,6 +17,11 @@ class HashTable:
     Implement this.
     """
 
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.hash_table = [None] * self.capacity
+
+
     def fnv1(self, key):
         """
         FNV-1 64-bit hash function
@@ -30,6 +35,11 @@ class HashTable:
 
         Implement this, and/or FNV-1.
         """
+        hash = 5381
+        for x in key:
+            hash = (( hash << 5 ) + hash) + ord(x)
+        return hash & 0xFFFFFFFF
+
 
     def hash_index(self, key):
         """
@@ -47,6 +57,9 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        self.hash_table[index] = value
+
 
     def delete(self, key):
         """
@@ -56,6 +69,8 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        self.hash_table[index] = None
 
     def get(self, key):
         """
@@ -65,6 +80,9 @@ class HashTable:
 
         Implement this.
         """
+        index = self.hash_index(key)
+        return self.hash_table[index]
+
 
     def resize(self):
         """
