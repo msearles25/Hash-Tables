@@ -13,7 +13,6 @@ class LinkedList:
         self.head = node
         self.tail = node
 
-
     def add_to_tail(self, key, value):
         entry = HashTableEntry(key, value)
 
@@ -70,7 +69,8 @@ class HashTable:
 
     def __init__(self, capacity):
         self.capacity = capacity
-        self.hash_table = [LinkedList()] * self.capacity
+        self.storage = [LinkedList()] * self.capacity
+        self.added_in = set()
 
 
     def fnv1(self, key):
@@ -92,6 +92,8 @@ class HashTable:
         return hash & 0xFFFFFFFF
 
 
+
+
     def hash_index(self, key):
         """
         Take an arbitrary key and return a valid integer index
@@ -108,8 +110,16 @@ class HashTable:
 
         Implement this.
         """
+        load_factor = len(self.added_in) / self.capacity
+        if load_factor >= 0.7:
+            self.resize(self.capacity * 2)
+        
         index = self.hash_index(key)
-        self.hash_table[index].add_to_tail(key, value)
+        self.storage[index].add_to_tail(key, value)
+
+        if key not in self.added_in:
+            self.added_in.add(key)
+
 
 
     def delete(self, key):
@@ -121,7 +131,8 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        self.hash_table[index].delete(key)
+        self.storage[index].delete(key)
+        self.added_in.remove(key)
 
     def get(self, key):
         """
@@ -132,16 +143,30 @@ class HashTable:
         Implement this.
         """
         index = self.hash_index(key)
-        return self.hash_table[index].find(key)
+        return self.storage[index].find(key)
 
-
-    def resize(self):
+    def resize(self, new_capacity):
         """
         Doubles the capacity of the hash table and
         rehash all key/value pairs.
 
         Implement this.
         """
+
+        self.capacity = new_capacity
+        new_hash_table = [LinkedList()] * self.capacity
+
+        for i in self.storage:
+            cur = i.head
+            
+            while cur is not None:
+                
+                index = self.hash_index(cur.key)
+                new_hash_table[index].add_to_tail(cur.key, cur.value)
+
+                cur = cur.next
+
+        self.storage = new_hash_table
 
 if __name__ == "__main__":
     ht = HashTable(2)
@@ -153,20 +178,20 @@ if __name__ == "__main__":
     print("")
 
     # Test storing beyond capacity
-    print(ht.get("line_1"))
-    print(ht.get("line_2"))
-    print(ht.get("line_3"))
+    # print(ht.get("line_1"))
+    # print(ht.get("line_2"))
+    # print(ht.get("line_3"))
 
     # Test resizing
-    old_capacity = len(ht.storage)
-    ht.resize()
-    new_capacity = len(ht.storage)
+    # old_capacity = len(ht.storage)
+    # ht.resize(old_capacity * 2)
+    # new_capacity = len(ht.storage)
 
-    print(f"\nResized from {old_capacity} to {new_capacity}.\n")
+    # print(f"\nResized from {old_capacity} to {new_capacity}.\n")
 
     # Test if data intact after resizing
-    print(ht.get("line_1"))
-    print(ht.get("line_2"))
-    print(ht.get("line_3"))
+    # print(ht.get("line_1"))
+    # print(ht.get("line_2"))
+    # print(ht.get("line_3"))
 
     print("")
