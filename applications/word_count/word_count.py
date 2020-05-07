@@ -1,5 +1,26 @@
 def word_count(s):
     # Implement me.
+    d = {}
+    ignoreThese = ['"', ':', ';', ',', '.', '-', '+', '=', '/', '\\', 
+    '|', '[', ']', '{', '}', '(', ')', '*', '^', '&']
+    splitString = s.split(' ')
+
+    for word in splitString:
+        word = word.lower()
+
+        for c in word:
+            if c in ignoreThese:
+                word = word.replace(c, '')
+        if word == '':
+            return d
+        if word not in d:
+            d[word] = 1
+        else:
+            d[word] += 1
+
+    # print(splitString)
+
+    return d
 
 
 if __name__ == "__main__":
